@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'ded8-2001-b011-3006-3b6a-19b2-605e-aa38-2801.jp.ngrok.io'  #允許的網域名稱
+    'ff9f-2001-b011-3006-9e85-41b5-9501-5018-b44d.jp.ngrok.io'  #允許的網域名稱
 ]
 
 

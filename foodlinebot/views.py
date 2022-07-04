@@ -1,3 +1,5 @@
+from cgi import test
+from unicodedata import name
 from unittest import result
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
@@ -10,19 +12,18 @@ from linebot.exceptions import InvalidSignatureError, LineBotApiError
 from linebot.models import *
 
 from mylinebot import secret 
-from .scraper import IFoodie
+from .scraper import *
 from .config import County
 
 line_bot_api = LineBotApi(secret.LINE_CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(secret.LINE_CHANNEL_SECRET)
 
-
-
+addressforgoogle =[None]
 flag = 0
 result = None
 @csrf_exempt
 def callback(request):
-    global flag, result
+    global flag, result, addressforgoogle
     if request.method == 'POST':
         signature = request.META['HTTP_X_LINE_SIGNATURE']
         body = request.body.decode('utf-8')
@@ -35,6 +36,37 @@ def callback(request):
             return HttpResponseBadRequest()
         
         for event in events:
+            
+
+            
+            def create_carousel(i):
+                return CarouselColumn(
+                            thumbnail_image_url=picture[i],
+                            title=name[i],
+                            text=address2[i]+'\n'+'評價為' + str(score[i]) + '顆星 ，'+price[i] ,
+                            actions=[
+                                PostbackTemplateAction(
+                                    label='前往導航',
+                                    text='進去後點擊右下角可切換至google map導航喔~',
+                                    data = 'C&地址' + str(i)
+                                ),
+                                # URITemplateAction(
+                                #     label='前往導航',
+                                #     text= '評價為' + str(score[i]) + '顆星',
+                                #     uri = 'https://www.google.com.tw/maps/place/' + address2[i]
+                                # ),
+                                URITemplateAction(
+                                    label='查看更多選擇',
+                                    text=price[i],
+                                    uri = test[0]
+                                ),                                
+                                URITemplateAction(
+                                    label='查看店家詳細內容',
+                                    text ='',
+                                    uri= link[i],
+                                )
+                            ]
+                        )
             if isinstance(event, MessageEvent) :  # 如果有訊息事件
                 if  event.message.text in County:                        
                     flag = 2
@@ -49,15 +81,12 @@ def callback(request):
                         if result[0] == '臺':
                             result = result.replace('臺','台')
                         
-                        # else:
-                        #     result = event.message.text +'市'
                     
                 # if isinstance(event, MessageEvent) and len(event.message.text) == 3 and event.message.text in County:
                 #     flag = 3;
                 if event.message.text == "查詢":
-                    print('第一階段')
                     flag = 1
-                    line_bot_api.reply_message(  # 回復傳入的訊息文字
+                    line_bot_api.reply_message(
                         event.reply_token,
                         TemplateSendMessage(
                             alt_text='Buttons template',
@@ -92,8 +121,6 @@ def callback(request):
                     
                 if isinstance(event, MessageEvent) and flag == 2 and event.message.text in County:
                     # flag = 3
-                    print('成功囉')
-                    print(flag)
                     line_bot_api.reply_message(  # 回復傳入的訊息文字
                         event.reply_token,
                         TemplateSendMessage(
@@ -158,8 +185,6 @@ def callback(request):
                                     ]))
                         
                         line_bot_api.reply_message(event.reply_token, flex_message)
-                    # else:
-                    #     line_bot_api.reply_message(event.reply_token, TextSendMessage(message))
                         
                         
                 
@@ -177,8 +202,6 @@ def callback(request):
                                     ]))
                         
                         line_bot_api.reply_message(event.reply_token, flex_message)
-                    # else:
-                    #     line_bot_api.reply_message(event.reply_token, TextSendMessage(message))
                     
                     
                     elif event.postback.data[2:] == "東區和離島":
@@ -200,11 +223,33 @@ def callback(request):
                             result,
                             '1'
                         )
+                                           
+                        food.scrape()
                         
-                        line_bot_api.reply_message(  # 爬取該地區正在營業，且符合所選擇的消費價格的前五大最高人氣餐廳
-                        event.reply_token,
-                        TextSendMessage(text=food.scrape())
-                        )
+                        if food.scrape()!= 0:
+                            amount = food.scrape()
+                            addressforgoogle = address2[0]
+                            line_bot_api.reply_message( 
+                                event.reply_token,
+                                TemplateSendMessage(                                
+                                    alt_text='Carousel template',
+                                    template =CarouselTemplate(
+                                        columns=[
+                                            create_carousel(i) for i in range(amount)
+                                        ]        
+                                    )
+                                )
+                            )
+                            
+                            gogo = GetPlace(
+                                addressforgoogle
+                            )
+                            
+                            print(gogo.scrape1())
+                            
+                        
+                        elif food.scrape() == 0:
+                            line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '目前這個價位沒有營業中的餐廳喔~'))
                     
                     
                     if event.postback.data[2:] == "&2":
@@ -214,10 +259,24 @@ def callback(request):
                             '2'
                         )
                         
-                        line_bot_api.reply_message(  # 爬取該地區正在營業，且符合所選擇的消費價格的前五大最高人氣餐廳
-                        event.reply_token,
-                        TextSendMessage(text=food.scrape())
-                        )    
+                        food.scrape()
+                        
+                        if food.scrape()!= 0:
+                            amount = food.scrape()
+                            line_bot_api.reply_message( 
+                                event.reply_token,
+                                TemplateSendMessage(                                
+                                    alt_text='Carousel template',
+                                    template =CarouselTemplate(
+                                        columns=[
+                                            create_carousel(i) for i in range(amount)
+                                        ]        
+                                    )
+                                )
+                            )
+                        
+                        elif food.scrape() == 0:
+                            line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '目前這個價位沒有營業中的餐廳喔~'))  
                     
                     if event.postback.data[2:] == "&3":
                         
@@ -226,10 +285,24 @@ def callback(request):
                             '3'
                         )
                         
-                        line_bot_api.reply_message(  # 爬取該地區正在營業，且符合所選擇的消費價格的前五大最高人氣餐廳
-                        event.reply_token,                       
-                        TextSendMessage(text=food.scrape())
-                        )    
+                        food.scrape()
+                        
+                        if food.scrape()!= 0:
+                            amount = food.scrape()
+                            line_bot_api.reply_message( 
+                                event.reply_token,
+                                TemplateSendMessage(                                
+                                    alt_text='Carousel template',
+                                    template =CarouselTemplate(
+                                        columns=[
+                                            create_carousel(i) for i in range(amount)
+                                        ]        
+                                    )
+                                )
+                            )
+                        
+                        elif food.scrape() == 0:
+                            line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '目前這個價位沒有營業中的餐廳喔~'))   
                     
                     if event.postback.data[2:] == "&4":
                         
@@ -238,15 +311,49 @@ def callback(request):
                             '4'
                         )
                         
-                        line_bot_api.reply_message(  # 爬取該地區正在營業，且符合所選擇的消費價格的前五大最高人氣餐廳
-                        event.reply_token,                        
-                        TextSendMessage(text=food.scrape())
-                        )        
-                
-                    # else:
-                    #     line_bot_api.reply_message(event.reply_token, TextSendMessage(message))
+                        food.scrape()
+                        
+                        if food.scrape()!= 0:
+                            amount = food.scrape()
+                            line_bot_api.reply_message( 
+                                event.reply_token,
+                                TemplateSendMessage(                                
+                                    alt_text='Carousel template',
+                                    template =CarouselTemplate(
+                                        columns=[
+                                            create_carousel(i) for i in range(amount)
+                                        ]        
+                                    )
+                                )
+                            )
+                        
+                        elif food.scrape() == 0:
+                            line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '目前這個價位沒有營業中的餐廳喔~'))
                     
-                      
+                    gogo = GetPlace(
+                        addressforgoogle
+                    )
+
+                    gogo.scrape1()
+                
+                if event.postback.data[0:1] == "C":
+                    
+                    addressforgoogle = address2[int(event.postback.data[4:])]                    
+                    gogo = GetPlace(
+                        addressforgoogle
+                    )
+                    gogo.scrape1()
+                    
+                    line_bot_api.reply_message(  # 如果結果出來有到X家，多給一個訊息讓他可以選擇要不要進網站看其他選擇
+                    event.reply_token,                        
+                    LocationSendMessage(
+                        title = name[int(event.postback.data[4:])],
+                        address = address2[int(event.postback.data[4:])],
+                        latitude=gogo.scrape1()[1],
+                        longitude=gogo.scrape1()[0]
+                    )
+                    )
+                                            
         return HttpResponse()
     else:
         return HttpResponseBadRequest()
