@@ -43,7 +43,7 @@ def callback(request):
                         PostbackTemplateAction(
                             label='前往導航',
                             text='進去後點擊右下角可切換至google map導航喔~',
-                            data = 'D&' + str(i) +'&'+str(address2[i])+'&'+ name[i]
+                            data = 'E&' + str(i) +'&'+str(address2[i])+'&'+ name[i]
                         ),
                         # URITemplateAction(
                         #     label='前往導航',
@@ -114,35 +114,20 @@ def callback(request):
                 if flag == 2 and event.message.text in County:
                     line_bot_api.reply_message(  # 回復傳入的訊息文字
                         event.reply_token,
-                        TemplateSendMessage(
-                            alt_text='Buttons template',
-                            template=ButtonsTemplate(
-                                title='找美食',
-                                text='請選擇想要的價格區間',
-                                actions=[
-                                    PostbackTemplateAction(
-                                        label='150以內',
-                                        text='150以內',
-                                        data='C&&1'+ result,
-                                    ),
-                                    PostbackTemplateAction(
-                                        label='150-600',
-                                        text='150-600',
-                                        data='C&&2'+ result,
-                                    ),
-                                    PostbackTemplateAction(
-                                        label='600-1200',
-                                        text='600-1200',
-                                        data='C&&3'+ result,
-                                    ),
-                                    PostbackTemplateAction(
-                                        label='1200以上',
-                                        text='1200以上',
-                                        data='C&&4'+ result,
-                                    )
-                                ]
-                            )
-                        )
+                        TextSendMessage(text='搜找關鍵詞',
+                            quick_reply=QuickReply(items=[
+                                QuickReplyButton(action=PostbackAction(label="牛排", text="搜尋牛排", data='C&'+ result + '&' + '牛排')),
+                                QuickReplyButton(action=PostbackAction(label="拉麵", text="搜尋拉麵", data='C&'+ result + '&' + '拉麵')),
+                                QuickReplyButton(action=PostbackAction(label="壽司", text="搜尋壽司", data='C&'+ result + '&' + '壽司')),
+                                QuickReplyButton(action=PostbackAction(label="早餐與早午餐", text="搜尋早餐與早午餐", data='C&'+ result + '&' + '早餐與早午餐')),
+                                QuickReplyButton(action=PostbackAction(label="炸雞", text="搜尋炸雞", data='C&'+ result + '&' + '炸雞')),
+                                QuickReplyButton(action=PostbackAction(label="義式料理", text="搜尋義式料理", data='C&'+ result + '&' + '義式料理')),
+                                QuickReplyButton(action=PostbackAction(label="甜點", text="搜尋甜點", data='C&'+ result + '&' + '甜點')),
+                                QuickReplyButton(action=PostbackAction(label="泰式", text="搜尋泰式", data='C&'+ result + '&' + '泰式')),
+                                QuickReplyButton(action=PostbackAction(label="韓式", text="搜尋韓式", data='C&'+ result + '&' + '韓式')),
+                                QuickReplyButton(action=PostbackAction(label="燒烤", text="搜尋燒烤", data='C&'+ result + '&' + '燒烤')),
+                                QuickReplyButton(action=PostbackAction(label="不分類", text="不分類", data='C&'+ result + '&' + ''))
+                            ]))
                     )
                     
             elif isinstance(event, PostbackEvent):  # 如果有回傳值事件
@@ -203,8 +188,28 @@ def callback(request):
                                     ]))
                         
                         line_bot_api.reply_message(event.reply_token, flex_message) # 把按鈕呈現給使用者看
-                        
-                if  event.postback.data[0:1] == "B":
+                
+                
+                if event.postback.data[0:1] == "B":
+                    line_bot_api.reply_message(
+                        event.reply_token,
+                        TextSendMessage(text='今天想吃點什麼呢?',               
+                            quick_reply=QuickReply(items=[
+                                QuickReplyButton(action=PostbackAction(label="牛排", text="搜尋牛排", data='C&'+ event.postback.data[2:] + '&' + '牛排')),
+                                QuickReplyButton(action=PostbackAction(label="拉麵", text="搜尋拉麵", data='C&'+ event.postback.data[2:] + '&' + '拉麵')),
+                                QuickReplyButton(action=PostbackAction(label="壽司", text="搜尋壽司", data='C&'+ event.postback.data[2:] + '&' + '壽司')),
+                                QuickReplyButton(action=PostbackAction(label="早餐與早午餐", text="搜尋早餐與早午餐", data='C&'+ event.postback.data[2:] + '&' + '早餐與早午餐')),
+                                QuickReplyButton(action=PostbackAction(label="炸雞", text="搜尋炸雞", data='C&'+ event.postback.data[2:] + '&' + '炸雞')),
+                                QuickReplyButton(action=PostbackAction(label="義式料理", text="搜尋義式料理", data='C&'+ event.postback.data[2:] + '&' + '義式料理')),
+                                QuickReplyButton(action=PostbackAction(label="甜點", text="搜尋甜點", data='C&'+ event.postback.data[2:] + '&' + '甜點')),
+                                QuickReplyButton(action=PostbackAction(label="泰式", text="搜尋泰式", data='C&'+ event.postback.data[2:] + '&' + '泰式')),
+                                QuickReplyButton(action=PostbackAction(label="韓式", text="搜尋韓式", data='C&'+ event.postback.data[2:] + '&' + '韓式')),
+                                QuickReplyButton(action=PostbackAction(label="燒烤", text="搜尋燒烤", data='C&'+ event.postback.data[2:] + '&' + '燒烤')),
+                                QuickReplyButton(action=PostbackAction(label="不分類", text="不分類", data='C&'+ event.postback.data[2:] + '&' + ''))
+                            ]))
+                    )
+                      
+                if event.postback.data[0:1] == "C":
                     line_bot_api.reply_message(  # 回復傳入的訊息文字
                         event.reply_token,
                         TemplateSendMessage(
@@ -216,33 +221,35 @@ def callback(request):
                                     PostbackTemplateAction(
                                         label='150以內',
                                         text='150以內',
-                                        data='C&&1'+ event.postback.data[2:],
+                                        data='D&1&'+ event.postback.data[2:],
                                     ),
                                     PostbackTemplateAction(
                                         label='150-600',
                                         text='150-600',
-                                        data='C&&2'+ event.postback.data[2:],
+                                        data='D&2&'+ event.postback.data[2:],
                                     ),
                                     PostbackTemplateAction(
                                         label='600-1200',
                                         text='600-1200',
-                                        data='C&&3'+ event.postback.data[2:],
+                                        data='D&3&'+ event.postback.data[2:],
                                     ),
                                     PostbackTemplateAction(
                                         label='1200以上',
                                         text='1200以上',
-                                        data='C&&4'+ event.postback.data[2:],
+                                        data='D&4&'+ event.postback.data[2:],
                                     )
                                 ]
                             )
                         )
                     )
                             
-                if event.postback.data[0:1] == "C": 
-                    if event.postback.data[2:4] == "&1":
+                if event.postback.data[0:1] == "D": 
+                    find = tuple(event.postback.data.split('&'))
+                    if event.postback.data[2:4] == "1&":
                         
                         food = IFoodie(
-                            event.postback.data[4:],
+                            find[2], #這是哪個縣市
+                            find[3], #這是哪個分類
                             '1'
                         )
                         
@@ -264,10 +271,11 @@ def callback(request):
                             line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '目前這個價位沒有營業中的餐廳喔~'))
                     
                     
-                    if event.postback.data[2:4] == "&2":
+                    if event.postback.data[2:4] == "2&":
                         
                         food = IFoodie(
-                            event.postback.data[4:],
+                            find[2], #這是哪個縣市
+                            find[3], #這是哪個分類
                             '2'
                         )
                         
@@ -288,10 +296,11 @@ def callback(request):
                         elif food.scrape() == 0:
                             line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '目前這個價位沒有營業中的餐廳喔~'))  
                     
-                    if event.postback.data[2:4] == "&3":
+                    if event.postback.data[2:4] == "3&":
                         
                         food = IFoodie(
-                            event.postback.data[4:],
+                            find[2], #這是哪個縣市
+                            find[3], #這是哪個分類
                             '3'
                         )
                         
@@ -312,10 +321,11 @@ def callback(request):
                         elif food.scrape() == 0:
                             line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '目前這個價位沒有營業中的餐廳喔~'))   
                     
-                    if event.postback.data[2:4] == "&4":
+                    if event.postback.data[2:4] == "4&":
                         
                         food = IFoodie(
-                            event.postback.data[4:],
+                            find[2], #這是哪個縣市
+                            find[3], #這是哪個分類
                             '4'
                         )
                         
@@ -336,7 +346,7 @@ def callback(request):
                         elif food.scrape() == 0:
                             line_bot_api.reply_message(event.reply_token, TextSendMessage(text= '目前這個價位沒有營業中的餐廳喔~'))
                                   
-                if event.postback.data[0:1] == "D":
+                if event.postback.data[0:1] == "E":
                     
                     ans = tuple(event.postback.data.split('&'))
                     addressforgoogle = event.postback.data[3:]                    
