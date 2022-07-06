@@ -55,8 +55,6 @@ class GetPlace(Place):
         initial_pos = text.find(";window.APP_INITIALIZATION_STATE")#尋找;window.APP_INITIALIZATION_STATE所在位置
         data = text[initial_pos+36:initial_pos+81] #將其後的參數進行存取
         data = re.sub('\[|\]','',data)
-        # data = data.replace('[','')
-        # data = data.replace(']','')
         print('下面那行是data')
         print(data)
         line = tuple(data.split(','))
@@ -134,66 +132,3 @@ class IFoodie(Food):
                 cnt += 1
                 
         return cnt
-
-# # 愛食記爬蟲
-# class IFoodie(Food):
-       
-#     def scrape(self):
-#         response = requests.get(
-#             "https://ifoodie.tw/explore/" + self.area +
-#             "/list?sortby=rating&opening=true&priceLevel=" + self.price)
-        
-#         more[0] = str("https://ifoodie.tw/explore/" + self.area +
-#             "/list?sortby=rating&opening=true&priceLevel=" + self.price)
-        
-#         soup = BeautifulSoup(response.content, "html.parser")
-        
-        
-#         cards = soup.find_all( # 爬取前X筆餐廳卡片資料
-#             'div', {'class': 'jsx-3292609844 restaurant-info'}, limit=10)
- 
-#         content = ""
-              
-#         cnt = 0
-#         for card in cards:
-            
-#             title = card.find(  # 餐廳名稱
-#                 "a", {"class": "jsx-3292609844 title-text"}).getText()
-#             name[cnt] = title[0:40]
-            
-#             google[cnt] = "https://www.google.com.tw/maps/" + title
-            
-#             stars = card.find(  # 餐廳評價
-#                 "div", {"class": "jsx-1207467136 text"}).getText()
-            
-#             score[cnt] = stars
- 
-#             address = card.find(  # 餐廳地址
-#                 "div", {"class": "jsx-3292609844 address-row"}).getText()
-#             address2[cnt] = address
-            
-#             avgprice = card.find(  # 餐聽均消
-#                 "div", {"class": "jsx-3292609844 avg-price"}).getText()
-#             avgprice = avgprice.replace('·','')
-#             price[cnt] = avgprice
-                       
-#             url = card.find(  # 餐聽網址
-#                 class_='jsx-3292609844 title-text', href=True)['href'] # output出來的是url這個物件中，把它當作成dict來處理後，href這個key的value
-#             link[cnt] = 'https://ifoodie.tw' + url
-            
-            
-#             if cnt == 0 or cnt == 1:
-#                 img = card.find(  # 餐聽圖片
-#                     'img',src = True)['src'] # output出來的是img這個物件中，把它當作成dict來處理後，src這個key的value
-#                 picture[cnt] = img
-#                 # content += f"{title}\n{stars}顆星{avgprice}\n地址:{address} \n網址:https://ifoodie.tw{url} \n\n"
-#                 cnt += 1
-#             else :
-#                 img = card.find(  # 餐聽圖片
-#                     'img' ,{"class": "jsx-3292609844"})['data-src']# output出來的是img這個物件中，把它當作成dict來處理後，data-src這個key的value
-#                 picture[cnt] = img            
-#                 # content += f"{title}\n{stars}顆星{avgprice}\n地址:{address} \n網址:https://ifoodie.tw{url} \n\n"#將取得的餐廳名稱、評價及地址連結一起，並且指派給content變數
-           
-#                 cnt += 1
-                
-#         return cnt
