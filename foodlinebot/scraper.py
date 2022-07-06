@@ -55,8 +55,6 @@ class GetPlace(Place):
         initial_pos = text.find(";window.APP_INITIALIZATION_STATE")#尋找;window.APP_INITIALIZATION_STATE所在位置
         data = text[initial_pos+36:initial_pos+81] #將其後的參數進行存取
         data = re.sub('\[|\]','',data)
-        print('下面那行是data')
-        print(data)
         line = tuple(data.split(','))
         num1 = float(line[1]) #這格是經度
         num2 = float(line[2]) #這格是緯度
