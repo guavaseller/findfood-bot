@@ -180,8 +180,6 @@ def callback(request):
                                 ])
                             )
                         )
-                        
-                        line_bot_api.reply_message(event.reply_token, flex_message)
                     
                     
                     elif event.postback.data[2:] == "東區和離島":
