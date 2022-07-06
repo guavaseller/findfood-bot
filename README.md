@@ -1,4 +1,4 @@
-# findfood-bot
+# findfood-bot(參考資料)
 用來尋找當前有營業，且評分最高的餐廳們
 
 1.創建基本架構及將linebot與LINE Platform做連接---https://www.learncodewithmike.com/2020/06/python-line-bot.html
